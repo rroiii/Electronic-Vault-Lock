@@ -2,24 +2,22 @@ LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
-entity password_encrypter is
-    port (
+ENTITY password_encrypter IS
+    PORT (
         decrypted_password : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         encrypted_password : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
     );
-end entity password_encrypter;
+END ENTITY password_encrypter;
 
-architecture rtl of password_encrypter is
-    signal temp : STD_LOGIC_VECTOR(0 to 15);
-begin
+ARCHITECTURE rtl OF password_encrypter IS
+    SIGNAL temp : STD_LOGIC_VECTOR(0 TO 15);
+BEGIN
 
-    for i in decrypted_password'range generate
-        temp(i) <= decrypted_password(i)  
-    end generate;
+    tempPass : FOR i IN decrypted_password'RANGE GENERATE
+        temp(i) <= decrypted_password(i);
+    END GENERATE;
 
-    for i in decrypted_password'range generate
-        encrypted_password(i) <= decrypted_password(i) xor temp(i);
-    end generate;
-    
-    
-end architecture rtl;
+    encryptPass : FOR i IN decrypted_password'RANGE GENERATE
+        encrypted_password(i) <= decrypted_password(i) XOR temp(i);
+    END GENERATE;
+END ARCHITECTURE rtl;

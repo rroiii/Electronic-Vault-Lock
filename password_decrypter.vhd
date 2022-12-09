@@ -10,14 +10,14 @@ ENTITY password_decrypter IS
 END ENTITY password_decrypter;
 
 ARCHITECTURE rtl OF password_decrypter IS
-    signal temp : STD_LOGIC_VECTOR(0 to 15);
+    SIGNAL temp : STD_LOGIC_VECTOR(0 TO 15);
 BEGIN
-    for i in encrypted_password'range generate
-        temp(i) <= encrypted_password(i)  
-    end generate;
+    tempPass : FOR i IN encrypted_password'RANGE GENERATE
+        temp(i) <= encrypted_password(i);
+    END GENERATE;
 
-    for i in encrypted_password'range generate
-        decrypted_password(i) <= encrypted_password(i) xor temp(i);
-    end generate;
-    
+    decryptPass : FOR i IN encrypted_password'RANGE GENERATE
+        decrypted_password(i) <= encrypted_password(i) XOR temp(i);
+    END GENERATE;
+
 END ARCHITECTURE rtl;
