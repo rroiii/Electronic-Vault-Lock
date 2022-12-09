@@ -62,12 +62,9 @@ BEGIN
                         state <= digit1;
                         counter <= inputWaitTime;
                     ELSIF (counter = 0) THEN
-                        state <= waitTimer; -- Incorrect first digit, go to wait state
-                        counter <= lockWaitTime; -- Set the counter to 5 minutes
-                        seg_min <= STD_LOGIC_VECTOR(to_unsigned(counter / 6000, 4)); -- Calculate and display the minutes on the seven segment display
-                        seg_sec <= STD_LOGIC_VECTOR(to_unsigned(counter MOD 6000, 4)); -- Calculate and display the seconds on the seven segment display
+                        IncorrectDigit(counter, seg_min, seg_sec, state);
                     ELSE
-                        waitCounter(counter, seg_min, seg_sec);
+                        DecrementCounter(counter, seg_min, seg_sec);
                     END IF;
 
                 WHEN digit1 =>
@@ -77,12 +74,9 @@ BEGIN
                         seg_sec <= "0000";
                         counter <= inputWaitTime;
                     ELSIF (counter = 0) THEN
-                        state <= waitTimer; -- Incorrect second digit, go to wait state
-                        counter <= lockWaitTime; -- Set the counter to 5 minutes
-                        seg_min <= STD_LOGIC_VECTOR(to_unsigned(counter / 6000, 4)); -- Calculate and display the minutes on the seven segment display
-                        seg_sec <= STD_LOGIC_VECTOR(to_unsigned(counter MOD 6000, 4)); -- Calculate and display the seconds on the seven segment display
+                        IncorrectDigit(counter, seg_min, seg_sec, state);
                     ELSE
-                        waitCounter(counter, seg_min, seg_sec);
+                        DecrementCounter(counter, seg_min, seg_sec);
                     END IF;
                 WHEN digit2 =>
                     IF d = correctCombinationBiner(11 DOWNTO 8) THEN -- Third digit of combination
@@ -91,12 +85,9 @@ BEGIN
                         seg_sec <= "0000"; -- Clear the seconds on the seven segment display
                         counter <= inputWaitTime;
                     ELSIF (counter = 0) THEN
-                        state <= waitTimer; -- Incorrect third digit, go to wait state
-                        counter <= lockWaitTime; -- Set the counter to 5 minutes
-                        seg_min <= STD_LOGIC_VECTOR(to_unsigned(counter / 6000, 4)); -- Calculate and display the minutes on the seven segment display
-                        seg_sec <= STD_LOGIC_VECTOR(to_unsigned(counter MOD 6000, 4)); -- Calculate and display the seconds on the seven segment display
+                        IncorrectDigit(counter, seg_min, seg_sec, state);
                     ELSE
-                        waitCounter(counter, seg_min, seg_sec);
+                        DecrementCounter(counter, seg_min, seg_sec);
                     END IF;
                 WHEN digit3 =>
                     IF d = correctCombinationBiner(15 DOWNTO 12) THEN -- Fourth digit of combination
@@ -106,12 +97,9 @@ BEGIN
                         seg_min <= "0000"; -- Clear the minutes on the seven segment display
                         seg_sec <= "0000"; -- Clear the seconds on the seven segment display
                     ELSIF (counter = 0) THEN
-                        state <= waitTimer; -- Incorrect fourth digit, go to wait state
-                        counter <= lockWaitTime; -- Set the counter to 5 minutes
-                        seg_min <= STD_LOGIC_VECTOR(to_unsigned(counter / 6000, 4)); -- Calculate and display the minutes on the seven segment display
-                        seg_sec <= STD_LOGIC_VECTOR(to_unsigned(counter MOD 6000, 4)); -- Calculate and display the seconds on the seven segment display
+                        IncorrectDigit(counter, seg_min, seg_sec, state);
                     ELSE
-                        waitCounter(counter, seg_min, seg_sec);
+                        DecrementCounter(counter, seg_min, seg_sec);
                     END IF;
 
                 WHEN waitTimer =>
@@ -120,7 +108,7 @@ BEGIN
                         seg_min <= "0000"; -- Clear the minutes on the seven segment display
                         seg_sec <= "0000"; -- Clear the seconds on the seven segment display
                     ELSE
-                        waitCounter(counter, seg_min, seg_sec);
+                        DecrementCounter(counter, seg_min, seg_sec);
                     END IF;
                 WHEN unlocked =>
 
