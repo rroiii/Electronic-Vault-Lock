@@ -6,15 +6,16 @@ USE work.lock_constant.ALL;
 USE work.lock_types.ALL;
 
 PACKAGE lock_functions IS
-    PROCEDURE CheckDigit(
+    PROCEDURE InputDigit(
         SIGNAL counter : INOUT INTEGER RANGE 0 TO 300000;
         SIGNAL seg_min : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         SIGNAL seg_sec : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         SIGNAL state : OUT state_digit;
         SIGNAL nextState : INOUT state_digit;
+        SIGNAL state_lock : IN state_lock;
         setState : IN state_digit;
         d : IN STD_LOGIC_VECTOR(0 TO 3);
-        SIGNAL correctDigitBinary : IN STD_LOGIC_VECTOR(0 TO 3);
+        SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correct : OUT STD_LOGIC
     );
 
@@ -36,31 +37,45 @@ END PACKAGE lock_functions;
 PACKAGE BODY lock_functions IS
 
     -- Check digit if the input is the correct combination
-    PROCEDURE CheckDigit(
+    PROCEDURE InputDigit(
         SIGNAL counter : INOUT INTEGER RANGE 0 TO 300000;
         SIGNAL seg_min : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         SIGNAL seg_sec : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         SIGNAL state : OUT state_digit;
         SIGNAL nextState : INOUT state_digit;
+        SIGNAL state_lock : IN state_lock;
         setState : IN state_digit;
         d : IN STD_LOGIC_VECTOR(0 TO 3);
-        SIGNAL correctDigitBinary : IN STD_LOGIC_VECTOR(0 TO 3);
+        SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correct : OUT STD_LOGIC
     ) IS
     BEGIN
-        IF d = correctDigitBinary(0 TO 3) THEN -- First digit of combination
-            state <= nextState;
-            nextState <= setState;
-            counter <= inputWaitTime;
-            IF (nextState = unlocked) THEN
-                correct <= '1';
-            END IF;
-        ELSIF (counter = 0) THEN
-            IncorrectDigit(counter, seg_min, seg_sec, state);
-        ELSE
-            DecrementCounter(counter, seg_min, seg_sec);
-        END IF;
-    END PROCEDURE CheckDigit;
+        CASE state_lock IS
+            WHEN unlocking =>
+                IF d = correctDigitBinary(0 TO 3) THEN -- Check if the digit match the password digit
+                    state <= nextState;
+                    nextState <= setState;
+                    counter <= inputWaitTime;
+                    IF (nextState = unlocked) THEN
+                        correct <= '1';
+                    END IF;
+                ELSIF (counter = 0) THEN
+                    IncorrectDigit(counter, seg_min, seg_sec, state);
+                ELSE
+                    DecrementCounter(counter, seg_min, seg_sec);
+                END IF;
+            WHEN setNewLock =>
+                IF (counter = 0) THEN
+                    state <= nextState;
+                    nextState <= setState;
+                    counter <= inputSetLockTime;
+                    correctDigitBinary <= d;
+                ELSE
+                    DecrementCounter(counter, seg_min, seg_sec);
+                END IF;
+        END CASE;
+
+    END PROCEDURE InputDigit;
 
     -- The Entered Input is Incorrect, so set the state to waitTimer to wait for 30 seconds
     -- When its finish, start again from state start (code can be seen in safe_lock code)

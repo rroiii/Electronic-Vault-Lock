@@ -6,6 +6,7 @@ USE work.lock_types.ALL;
 
 PACKAGE lock_constant IS
 
+    CONSTANT inputSetLockTime : INTEGER := 1000;
     CONSTANT inputWaitTime : INTEGER := 5000;
     CONSTANT lockWaitTime : INTEGER := 30000;
 
