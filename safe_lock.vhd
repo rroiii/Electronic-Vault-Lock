@@ -39,6 +39,7 @@ ARCHITECTURE comb_lock OF safe_lock IS
     -- password encrypter component instance
     SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15);
     SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15);
+
 BEGIN
     P1 : password_decrypter PORT MAP(encrypted_password => encrypted_password, decrypted_password => decrypted_password);
     PROCESS (clk, rst)
@@ -81,17 +82,27 @@ BEGIN
 
                 WHEN unlocked => -- When the safe is unlocked, you are given 2 buttons, either lock back the safe 
                     -- or set a new combination digit password . You are given 5 seconds until the safe gets back to being locked again
+
+                    IF (state_lock = setNewLock) THEN -- Convert the new password to integer (for easier reading)
+                        correctCombination(0) <= to_integer(unsigned(correctCombinationBinary(0 TO 3)));
+                        correctCombination(1) <= to_integer(unsigned(correctCombinationBinary(4 TO 7)));
+                        correctCombination(2) <= to_integer(unsigned(correctCombinationBinary(8 TO 11)));
+                        correctCombination(3) <= to_integer(unsigned(correctCombinationBinary(12 TO 15)));
+                    END IF;
+
                     IF (btn_lock = '1' OR counter = 0) THEN -- When pressed, lock the safe or when the counter hits 0
                         state <= start;
                         nextState <= digit1;
                         state_lock <= unlocking;
                         counter <= inputWaitTime;
+                        correct <= '0';
 
                     ELSIF (btn_set = '1') THEN -- When pressed, set a new digit combination password 
                         state <= start;
                         nextState <= digit1;
                         state_lock <= setNewLock;
                         counter <= inputSetLockTime;
+                        correct <= '0';
                     ELSE
                         DecrementCounter(counter, seg_min, seg_sec);
                     END IF;

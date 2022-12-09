@@ -36,7 +36,7 @@ END PACKAGE lock_functions;
 
 PACKAGE BODY lock_functions IS
 
-    -- Check digit if the input is the correct combination
+    -- To Check digit if the input is the correct combination or setting a new digit combination password
     PROCEDURE InputDigit(
         SIGNAL counter : INOUT INTEGER RANGE 0 TO 300000;
         SIGNAL seg_min : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -69,7 +69,7 @@ PACKAGE BODY lock_functions IS
                     state <= nextState;
                     nextState <= setState;
                     counter <= inputSetLockTime;
-                    correctDigitBinary <= d;
+                    correctDigitBinary <= d; -- Set the new digit password
                 ELSE
                     DecrementCounter(counter, seg_min, seg_sec);
                 END IF;
