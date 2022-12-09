@@ -17,7 +17,8 @@ PACKAGE lock_functions IS
         setState : IN state_digit;
         d : IN STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
-        SIGNAL correct : OUT STD_LOGIC
+        SIGNAL correct : OUT STD_LOGIC;
+        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 
     PROCEDURE IncorrectDigit(
@@ -35,8 +36,8 @@ PACKAGE lock_functions IS
         SIGNAL seg_sec2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
 
-    PROCEDURE Display_time_seven_segment(
-        SIGNAL time_value : INOUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    PROCEDURE Display_number_seven_segment(
+        SIGNAL digit_value : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL seven_segment : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 
@@ -56,7 +57,8 @@ PACKAGE BODY lock_functions IS
         setState : IN state_digit;
         d : IN STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
-        SIGNAL correct : OUT STD_LOGIC
+        SIGNAL correct : OUT STD_LOGIC;
+        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     ) IS
     BEGIN
         CASE state_lock IS
@@ -65,6 +67,7 @@ PACKAGE BODY lock_functions IS
                     state <= nextState;
                     nextState <= setState;
                     counter <= inputWaitTime;
+                    Display_number_seven_segment(correctDigitBinary(0 TO 3), seven_segment_digit);
                     IF (nextState = unlocked) THEN
                         correct <= '1';
                     END IF;
@@ -116,36 +119,36 @@ PACKAGE BODY lock_functions IS
         seg_sec1 <= STD_LOGIC_VECTOR(to_unsigned((counter MOD 60)/10, 4)); -- Calculate and display the seconds on the seven segment display
         seg_sec2 <= STD_LOGIC_VECTOR(to_unsigned((counter MOD 60) - (((counter MOD 60) / 10) * 10), 4)); -- Calculate and display the seconds on the seven segment displa
     END PROCEDURE DecrementCounter;
-
-    PROCEDURE Display_time_seven_segment(
-        SIGNAL time_value : INOUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    
+    PROCEDURE Display_number_seven_segment(
+        SIGNAL digit_value : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL seven_segment : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
-    ) IS 
-    BEGIN 
-        case time_value is
-        when "0000" => --0
-            seven_segment <= "0000001";
-        when "0001" => --1
-            seven_segment <= "1001111"; 
-        when "0010" => --2
-            seven_segment <= "0010010"; 
-        when "0011" => --3
-            seven_segment <= "0000110"; 
-        when "0100" => --4
-            seven_segment <= "1001100"; 
-        when "0101" => --5
-            seven_segment <= "0100100"; 
-        when "0110" => --6
-            seven_segment <= "0100000"; 
-        when "0111" => --7
-            seven_segment <= "0001111";
-        when "1000" => --8
-            seven_segment <= "0000000"; 
-        when "1001" =>
-            seven_segment <= "0000100"; 
-        when others =>
-            seven_segment <= "1111111";
+    ) IS
+    BEGIN
+        case digit_value is
+            when "0000" => --0
+                seven_segment <= "0000001";
+            when "0001" => --1
+                seven_segment <= "1001111"; 
+            when "0010" => --2
+                seven_segment <= "0010010"; 
+            when "0011" => --3
+                seven_segment <= "0000110"; 
+            when "0100" => --4
+                seven_segment <= "1001100"; 
+            when "0101" => --5
+                seven_segment <= "0100100"; 
+            when "0110" => --6
+                seven_segment <= "0100000"; 
+            when "0111" => --7
+                seven_segment <= "0001111";
+            when "1000" => --8
+                seven_segment <= "0000000"; 
+            when "1001" =>
+                seven_segment <= "0000100"; 
+            when others =>
+                seven_segment <= "1111111";
         end case;
-    END PROCEDURE Display_time_seven_segment;
+    END PROCEDURE Display_number_seven_segment;
 
 END PACKAGE BODY lock_functions;

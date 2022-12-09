@@ -14,6 +14,12 @@ ENTITY safe_lock IS
         btn_lock : IN STD_LOGIC := '0'; -- Button to lock the safe
         btn_set : IN STD_LOGIC := '0'; -- Button to set new password for the combination lock
         correct : OUT STD_LOGIC; -- Output indicating if the combination is correct
+
+        Seven_Segment_digit1 : inout STD_LOGIC_VECTOR (6 downto 0);
+        Seven_Segment_digit2 : inout STD_LOGIC_VECTOR (6 downto 0);
+        Seven_Segment_digit3 : inout STD_LOGIC_VECTOR (6 downto 0);
+        Seven_Segment_digit4 : inout STD_LOGIC_VECTOR (6 downto 0);
+
         Seven_Segment_Seconds1 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for the minutes on the seven segment display
         Seven_Segment_Seconds2 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for the first digit seconds on the seven segment display
         Seven_Segment_Minutes : inout STD_LOGIC_VECTOR (6 downto 0) -- Output for the second digit seconds on the seven segment display
@@ -37,6 +43,7 @@ ARCHITECTURE comb_lock OF safe_lock IS
             decrypted_password : OUT STD_LOGIC_VECTOR(0 TO 15)
         );
     END COMPONENT;
+
     -- password encrypter component instance
     SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15);
     SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15);
@@ -44,6 +51,7 @@ ARCHITECTURE comb_lock OF safe_lock IS
     SIGNAL seg_min : STD_LOGIC_VECTOR(3 DOWNTO 0); 
     SIGNAL seg_sec1 : STD_LOGIC_VECTOR(3 DOWNTO 0); 
     SIGNAL seg_sec2 : STD_LOGIC_VECTOR(3 DOWNTO 0); 
+
 BEGIN
     P1 : password_decrypter PORT MAP(encrypted_password => encrypted_password, decrypted_password => decrypted_password);
     PROCESS (clk, rst)
@@ -62,19 +70,18 @@ BEGIN
                     seg_sec2 <= STD_LOGIC_VECTOR(to_unsigned((counter MOD 60) - (((counter MOD 60) / 10) * 10), 4)); -- Calculate and display the seconds on the seven segment display
                     
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit2_STATE,
-                    d, correctCombinationBinary(0 TO 3), correct);
-
+                    d, correctCombinationBinary(0 TO 3), correct, Seven_Segment_digit1);
                 WHEN digit1 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit3_STATE,
-                    d, correctCombinationBinary(4 TO 7), correct);
+                    d, correctCombinationBinary(4 TO 7), correct, Seven_Segment_digit2);
 
                 WHEN digit2 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, unlocked_STATE,
-                    d, correctCombinationBinary(8 TO 11), correct);
+                    d, correctCombinationBinary(8 TO 11), correct, Seven_Segment_digit3);
 
                 WHEN digit3 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit1_STATE,
-                    d, correctCombinationBinary(12 TO 15), correct);
+                    d, correctCombinationBinary(12 TO 15), correct, Seven_Segment_digit4);
 
                 WHEN waitTimer =>       -- State when to wait for 30 seconds and go back to start state
                     IF counter = 0 THEN -- If the delay has expired
@@ -204,6 +211,7 @@ BEGIN
                 Seven_Segment_Seconds2 <= "1111111";
         end case;
     END PROCESS;
+    
 
     --PROCESS(seg_min, Seven_Segment_Minutes)
     --BEGIN
@@ -220,5 +228,4 @@ BEGIN
     --    Display_time_seven_segment(seg_sec2, Seven_Segment_Seconds2);
     --END PROCESS;
     
-
 END comb_lock;
