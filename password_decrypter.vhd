@@ -4,8 +4,8 @@ USE IEEE.numeric_std.ALL;
 
 ENTITY password_decrypter IS
     PORT (
-        encrypted_password : IN STD_LOGIC_VECTOR (11 DOWNTO 0);
-        decrypted_password : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+        encrypted_password : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+        decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
 END ENTITY password_decrypter;
 
