@@ -13,7 +13,7 @@ architecture rtl of password_encrypter is
     signal temp : STD_LOGIC_VECTOR(0 to 15);
 begin
 
-    for i in a'range generate
+    for i in decrypted_password'range generate
         temp(i) <= decrypted_password(i)  
     end generate;
 
