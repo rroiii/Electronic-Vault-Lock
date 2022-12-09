@@ -8,6 +8,7 @@ USE work.lock_functions.ALL;
 
 ENTITY safe_lock IS
     PORT (
+        clk_lamp : IN STD_LOGIC;
         clk : IN STD_LOGIC; -- Clock signal
         rst : IN STD_LOGIC := '0'; -- Reset signal
         d : IN STD_LOGIC_VECTOR(0 TO 3); -- Input for the combination lock
@@ -15,10 +16,12 @@ ENTITY safe_lock IS
         btn_set : IN STD_LOGIC := '0'; -- Button to set new password for the combination lock
         correct : OUT STD_LOGIC; -- Output indicating if the combination is correct
 
-        Seven_Segment_digit1 : inout STD_LOGIC_VECTOR (6 downto 0);
-        Seven_Segment_digit2 : inout STD_LOGIC_VECTOR (6 downto 0);
-        Seven_Segment_digit3 : inout STD_LOGIC_VECTOR (6 downto 0);
-        Seven_Segment_digit4 : inout STD_LOGIC_VECTOR (6 downto 0);
+        lamp_digit1, lamp_digit2, lamp_digit3, lamp_digit4 : INOUT STD_LOGIC_VECTOR  (1 downto 0) := "00"; -- Output lamp for each digit, 00 = OFF, RED = 01, GREEN = 10
+
+        Seven_Segment_digit1 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for digit 1 on the seven segment display
+        Seven_Segment_digit2 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for digit 2 on the seven segment display
+        Seven_Segment_digit3 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for digit 3 on the seven segment display
+        Seven_Segment_digit4 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for digit 4 on the seven segment display
 
         Seven_Segment_Seconds1 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for the minutes on the seven segment display
         Seven_Segment_Seconds2 : inout STD_LOGIC_VECTOR (6 downto 0); -- Output for the first digit seconds on the seven segment display
@@ -54,6 +57,7 @@ ARCHITECTURE comb_lock OF safe_lock IS
 
 BEGIN
     P1 : password_decrypter PORT MAP(encrypted_password => encrypted_password, decrypted_password => decrypted_password);
+
     PROCESS (clk, rst)
     BEGIN
         IF rst = '1' THEN
@@ -65,23 +69,35 @@ BEGIN
         ELSIF rising_edge(clk) THEN
             CASE state IS
                 WHEN start =>
+                    IF rising_edge(clk_lamp)THEN
+                        lamp_digit1 <= "01";
+                        lamp_digit2 <= "01";
+                        lamp_digit3 <= "01";
+                        lamp_digit4 <= "01";
+                    END IF;
+                    IF falling_edge(clk_lamp)THEN
+                        lamp_digit1 <= "00";
+                        lamp_digit2 <= "00";
+                        lamp_digit3 <= "00";
+                        lamp_digit4 <= "00";
+                    END IF;
                     seg_min <= STD_LOGIC_VECTOR(to_unsigned(counter / 60, 4)); -- Calculate and display the minutes on the seven segment display
                     seg_sec1 <= STD_LOGIC_VECTOR(to_unsigned((counter MOD 60)/10, 4)); -- Calculate and display the seconds on the seven segment display
                     seg_sec2 <= STD_LOGIC_VECTOR(to_unsigned((counter MOD 60) - (((counter MOD 60) / 10) * 10), 4)); -- Calculate and display the seconds on the seven segment display
                     
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit2_STATE,
-                    d, correctCombinationBinary(0 TO 3), correct, Seven_Segment_digit1);
+                    d, correctCombinationBinary(0 TO 3), correct, Seven_Segment_digit1, lamp_digit1);
                 WHEN digit1 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit3_STATE,
-                    d, correctCombinationBinary(4 TO 7), correct, Seven_Segment_digit2);
+                    d, correctCombinationBinary(4 TO 7), correct, Seven_Segment_digit2, lamp_digit2);
 
                 WHEN digit2 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, unlocked_STATE,
-                    d, correctCombinationBinary(8 TO 11), correct, Seven_Segment_digit3);
+                    d, correctCombinationBinary(8 TO 11), correct, Seven_Segment_digit3, lamp_digit3);
 
                 WHEN digit3 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit1_STATE,
-                    d, correctCombinationBinary(12 TO 15), correct, Seven_Segment_digit4);
+                    d, correctCombinationBinary(12 TO 15), correct, Seven_Segment_digit4, lamp_digit4);
 
                 WHEN waitTimer =>       -- State when to wait for 30 seconds and go back to start state
                     IF counter = 0 THEN -- If the delay has expired
@@ -97,6 +113,18 @@ BEGIN
                 WHEN unlocked => 
                     -- When the safe is unlocked, you are given 2 buttons, either lock back the safe 
                     -- or set a new combination digit password . You are given 5 seconds until the safe gets back to being locked again
+                    IF rising_edge(clk_lamp)THEN
+                        lamp_digit1 <= "10";
+                        lamp_digit2 <= "10";
+                        lamp_digit3 <= "10";
+                        lamp_digit4 <= "10";
+                    END IF;
+                    IF falling_edge(clk_lamp)THEN
+                        lamp_digit1 <= "00";
+                        lamp_digit2 <= "00";
+                        lamp_digit3 <= "00";
+                        lamp_digit4 <= "00";
+                    END IF;
 
                     IF (state_lock = setNewLock) THEN 
                         -- Convert the new password to integer (for easier reading)
@@ -128,6 +156,7 @@ BEGIN
         END IF;
     END PROCESS;
 
+    --Seven segment display for minutes
     PROCESS(seg_min, Seven_Segment_Minutes)
     BEGIN
         case seg_min is
@@ -156,6 +185,7 @@ BEGIN
         end case;
     END PROCESS;
     
+    --Seven segment display for first digit of seconds, ex = 0x, 1x, 2x
     PROCESS(seg_sec1, Seven_Segment_Seconds1)
     BEGIN
         case seg_sec1 is
@@ -183,7 +213,8 @@ BEGIN
                 Seven_Segment_Seconds1 <= "1111111";
         end case;
     END PROCESS;
-
+    
+    --Seven segment display for second digit of seconds, ex = x1, x2, x3
     PROCESS(seg_sec2, Seven_Segment_Seconds2)
     BEGIN
         case seg_sec2 is
@@ -211,21 +242,5 @@ BEGIN
                 Seven_Segment_Seconds2 <= "1111111";
         end case;
     END PROCESS;
-    
 
-    --PROCESS(seg_min, Seven_Segment_Minutes)
-    --BEGIN
-    --    Display_time_seven_segment(seg_min, Seven_Segment_Minutes);
-    --END PROCESS;
-
-    --PROCESS(seg_sec1, Seven_Segment_Seconds1)
-    --BEGIN
-    --    Display_time_seven_segment(seg_sec1, Seven_Segment_Seconds1);
-    --END PROCESS;
-
-    --PROCESS(seg_sec2, Seven_Segment_Seconds2)
-    --BEGIN
-    --    Display_time_seven_segment(seg_sec2, Seven_Segment_Seconds2);
-    --END PROCESS;
-    
 END comb_lock;

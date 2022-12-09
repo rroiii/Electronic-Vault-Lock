@@ -18,7 +18,8 @@ PACKAGE lock_functions IS
         d : IN STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correct : OUT STD_LOGIC;
-        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        SIGNAL lamp : INOUT STD_LOGIC_VECTOR  (1 downto 0)
     );
 
     PROCEDURE IncorrectDigit(
@@ -58,7 +59,8 @@ PACKAGE BODY lock_functions IS
         d : IN STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correctDigitBinary : INOUT STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL correct : OUT STD_LOGIC;
-        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+        SIGNAL seven_segment_digit : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        SIGNAL lamp : INOUT STD_LOGIC_VECTOR  (1 downto 0)
     ) IS
     BEGIN
         CASE state_lock IS
@@ -67,6 +69,7 @@ PACKAGE BODY lock_functions IS
                     state <= nextState;
                     nextState <= setState;
                     counter <= inputWaitTime;
+                    lamp <= "10"; -- Turn on the lamp with green color
                     Display_number_seven_segment(correctDigitBinary(0 TO 3), seven_segment_digit);
                     IF (nextState = unlocked) THEN
                         correct <= '1';
@@ -74,6 +77,7 @@ PACKAGE BODY lock_functions IS
                 ELSIF (counter = 0) THEN
                     IncorrectDigit(counter, seg_min, seg_sec1, seg_sec2, state);
                 ELSE
+                    lamp <= "01"; --Turn on the lamp with red color
                     DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
                 END IF;
             WHEN setNewLock =>
