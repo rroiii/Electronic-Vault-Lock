@@ -4,10 +4,11 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h3 align="center">Electronic Vault Lock</h3>
+
+  <h1 align="center">Electronic Vault Lock</h1>
 
   <p align="center">
-    
+    Kunci Kombinasi 4 digit
     <br />
     <a href="https://github.com/rroiii/Electronic-Vault-Lock"><strong>Explore the docs »</strong></a>
     <br />
@@ -19,6 +20,16 @@
     <a href="https://github.com/rroiii/Electronic-Vault-Lock/issues">Request Feature</a>
   </p>
 </div>
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#dekripsi">Dekripsi</a></li>
+    <li><a href="#state---state-kunci-kombinasi">State - State Kunci Kombinasi</a></li>
+    <li><a href="#alur-kerja-state-pada-kunci-kombinasi">Alur Kerja State Pada Kunci Kombinasi</a></li>
+  </ol>
+</details>
 
 ## Dekripsi
 Kunci kombinasi ini menerima 4 digit angka secara satu persatu. Jika semua digit yang dimasukkan benar, maka kunci kombinasi akan terbuka. Untuk memperlihatkan digit-digit akan tersebut digunakan 4 seven segment dan juga terdapat 4 LED yang digunakan untuk menandakan jika input angka yang dimasukkan benar atau tidak pada kunci kombinasinya. Setiap digit masing-masing dipasang dengan sebuah seven segment display dan LED. Setiap digit benar yang dimasukkan ke kunci kombinasi tersebut, maka seven segment akan mendisplay angka tersebut dan LED akan menyala warna hijau. Jika digit yang dimasukkan salah, maka seven segment tidak akan mendisplay apa-apa dan LED akan menyala berwarna merah, menyatakan bahwa digit yang dimasukkan salah.
