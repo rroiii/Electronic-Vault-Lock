@@ -39,6 +39,7 @@ ___
     <li><a href="#state---state-kunci-kombinasi">State - State Kunci Kombinasi</a></li>
     <li><a href="#state-diagram">State Diagram</a></li>
     <li><a href="#alur-kerja-state-pada-kunci-kombinasi">Alur Kerja State Pada Kunci Kombinasi</a></li>
+    <li><a href="#kode-testbench-safe-lock">Kode Testbench Safe Lock</a></li>
      <li><a href="#hasil-wave-simulation-modelsim">Hasil Wave Simulation ModelSim</a></li>
      <li><a href="#sintesis-rangkaian">Sintesis Rangkaian</a></li>
   </ol>
