@@ -69,11 +69,8 @@ digit3
 [forks-url]: https://github.com/rroiii/Electronic-Vault-Lock/network/members
 
 
-#Hasil Sintesis State Diagram
-![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/State%20Diagram%20Synthesis.png)
-
-#Hasil Test Bench
+Hasil Test Bench
 ![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Hasil%20Test%20Bench.png)
 
-#Hasil Synthesis
+Hasil Synthesis
 ![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Synthesis.png)
