@@ -78,6 +78,7 @@ PACKAGE BODY lock_functions IS
     ) IS
     BEGIN
         CASE state_lock IS
+                -- If the user is trying to unlock the safe
             WHEN unlocking =>
                 IF d = correctDigitBinary(0 TO 3) THEN -- Check if the digit match the password digit
                     state <= nextState;
@@ -94,11 +95,12 @@ PACKAGE BODY lock_functions IS
                     lamp <= "01"; --Turn on the lamp with red color
                     DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
                 END IF;
+                -- If the user is trying to set the new lock combination for the safe, be given 1 seconds to enter the new digit
             WHEN setNewLock =>
                 IF (counter = 0) THEN
                     state <= nextState;
                     nextState <= setState;
-                    counter <= inputSetLockTime;
+                    SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
                     correctDigitBinary <= d; -- Set the new digit password
                 ELSE
                     DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
@@ -135,6 +137,7 @@ PACKAGE BODY lock_functions IS
         seg_sec2 <= STD_LOGIC_VECTOR(to_unsigned(((counter - 1) MOD 60) - ((((counter - 1) MOD 60) / 10) * 10), 4)); -- Calculate and display the seconds on the seven segment displa
     END PROCEDURE DecrementCounter;
 
+    -- To convert 4 bit to BCD Seven Segment
     PROCEDURE Display_number_seven_segment(
         SIGNAL digit_value : IN STD_LOGIC_VECTOR(0 TO 3);
         SIGNAL seven_segment : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
@@ -166,6 +169,7 @@ PACKAGE BODY lock_functions IS
         END CASE;
     END PROCEDURE Display_number_seven_segment;
 
+    -- To encrypt password
     PROCEDURE EncryptPassword(
         SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
         SIGNAL KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -181,6 +185,7 @@ PACKAGE BODY lock_functions IS
         END LOOP;
     END PROCEDURE EncryptPassword;
 
+    -- To set the counter to a specific integer
     PROCEDURE SetCounter(
         timeToWait : IN INTEGER;
         SIGNAL counter : OUT INTEGER RANGE 0 TO 300;
