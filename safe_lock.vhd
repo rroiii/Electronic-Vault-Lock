@@ -12,8 +12,8 @@ ENTITY safe_lock IS
         clk : IN STD_LOGIC; -- Clock signal
         rst : IN STD_LOGIC := '0'; -- Reset signal
         d : IN STD_LOGIC_VECTOR(0 TO 3); -- Input for the combination lock
-        btn_lock : INOUT STD_LOGIC := '0'; -- Button to lock the safe
-        btn_set : INOUT STD_LOGIC := '0'; -- Button to set new password for the combination lock
+        btn_lock : IN STD_LOGIC; -- Button to lock the safe
+        btn_set : IN STD_LOGIC; -- Button to set new password for the combination lock
         correct : OUT STD_LOGIC := '0'; -- Output indicating if the combination is correct (Default is 0)
 
         -- 00 = OFF, RED = 01, GREEN = 10
@@ -139,7 +139,6 @@ BEGIN
                         state_lock <= unlocking;
                         SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
-                        btn_lock <= '0';
                         -- When pressed, set a new digit combination password     
                     ELSIF (btn_set = '1') THEN
                         state <= start;
@@ -147,7 +146,6 @@ BEGIN
                         state_lock <= setNewLock;
                         SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
-                        btn_set <= '0';
                     ELSE
                         DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
                     END IF;
