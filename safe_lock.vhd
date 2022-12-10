@@ -35,23 +35,26 @@ ARCHITECTURE comb_lock OF safe_lock IS
     SIGNAL state : state_digit := start; -- State of the combination lock digit
     SIGNAL nextState : state_digit := digit1; -- Next State
     SIGNAL state_lock : state_lock := unlocking; -- State whether the user is unlocking the lock or setting a new password digit
-    SIGNAL KEY : STD_LOGIC_VECTOR(15 DOWNTO 0) := "1010101010101010"; -- Key for the encryption and decryption password
+
     SIGNAL correctCombination : int_array := (4, 2, 3, 5); -- Correct combination
-    SIGNAL correctCombinationBinary : STD_LOGIC_VECTOR(0 TO 15) := "0100001000110101"; -- Correct combination in binary
+
 
     SIGNAL counter : INTEGER RANGE 0 TO 300 := inputWaitTime; -- 5-minute counters, Default value is 5 seconds
 
     -- password encrypter component
-    COMPONENT password_decrypter
-        PORT (
-            KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            encrypted_password : IN STD_LOGIC_VECTOR (0 TO 15);
-            decrypted_password : OUT STD_LOGIC_VECTOR(0 TO 15)
-        );
-    END COMPONENT;
+    COMPONENT password_decrypter IS
+    PORT (
+        KEY: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        encrypted_password : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+        decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    );
 
-    -- password encrypter component instance
+        END COMPONENT password_decrypter;
+
+    SIGNAL KEY : STD_LOGIC_VECTOR(15 DOWNTO 0) := "1010101010101010";
     SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "1110100010011111";
+    signal correctCombinationBinary : STD_LOGIC_VECTOR(0 TO 15) := "0000000000000000";
+    -- password encrypter component instance
     SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "0000000000000000";
 
     SIGNAL seg_min : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
@@ -59,10 +62,13 @@ ARCHITECTURE comb_lock OF safe_lock IS
     SIGNAL seg_sec2 : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0101"; -- 5 seconds display by default
 
 BEGIN
-    P1 : password_decrypter PORT MAP(KEY => KEY, encrypted_password => encrypted_password, decrypted_password => correctCombinationBinary);
+
+    P1 : password_decrypter PORT MAP(KEY, encrypted_password, decrypted_password);
+    correctCombinationBinary <= decrypted_password;
 
     PROCESS (clk, rst)
     BEGIN
+        correctCombinationBinary <= decrypted_password;
         IF rst = '1' THEN
             state <= start; -- Reset the state to start
             nextState <= digit1; -- Reset the next state to digit1
@@ -70,6 +76,7 @@ BEGIN
             correct <= '0'; -- Reset correct to '0'
             SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2); -- Reset the counter to inputWaitTime
             ELSIF rising_edge(clk) THEN
+
             CASE state IS
                 WHEN start =>
                     -- Set All LED lights to RED (01)
