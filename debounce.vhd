@@ -1,46 +1,44 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
 -- Debounce entity
-entity debounce is
-    port(
-        clk: in std_logic;
-        raw_signal: in std_logic
-        debounced_signal: out std_logic;
+ENTITY debounce IS
+    PORT (
+        clk : IN STD_LOGIC;
+        raw_signal : IN STD_LOGIC;
+        debounced_signal : OUT STD_LOGIC
     );
-end debounce;
+END debounce;
 
 -- Debounce architecture
-architecture debounce_arch of debounce is
-    signal counter: integer range 0 to 100;
-    signal debounce_delay: integer range 0 to 100;
-begin
+ARCHITECTURE debounce_arch OF debounce IS
 
     -- Initialize the counter and debounce delay
-    counter <= 0;
-    debounce_delay <= 10;
+    SIGNAL counter : INTEGER RANGE 0 TO 100 := 0;
+    SIGNAL debounce_delay : INTEGER RANGE 0 TO 100 := 10;
+BEGIN
 
     -- Debouncing process
-    debouncing : process(clk)
-    begin
-            if rising_edge(clk) then
-            if raw_signal = '1' then
-            counter <= counter + 1;
-            else
-            counter <= 0;
-            end if;
-        end if;
-    end process;
+    debouncing : PROCESS (clk)
+    BEGIN
+        IF rising_edge(clk) THEN
+            IF raw_signal = '1' THEN
+                counter <= counter + 1;
+            ELSE
+                counter <= 0;
+            END IF;
+        END IF;
+    END PROCESS;
 
     -- Output process
-    output: process(clk)
-        begin
-        if rising_edge(clk) then
-            if counter >= debounce_delay then
-            debounced_signal <= raw_signal;
-            end if;
-        end if;
-    end process;
+    output : PROCESS (clk)
+    BEGIN
+        IF rising_edge(clk) THEN
+            IF counter >= debounce_delay THEN
+                debounced_signal <= raw_signal;
+            END IF;
+        END IF;
+    END PROCESS;
 
-end debounce_arch;
+END debounce_arch;
