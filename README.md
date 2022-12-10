@@ -55,7 +55,7 @@ digit3
 ```
 ## State Diagram
 <div>
-    <img src="State Diagram Synthesis.png" alt="Logo" width="400" height="400">
+    <img src="State Diagram Synthesis.png" alt="Logo" width="500" height="400">
 </div>
   
 ## Alur Kerja State Pada Kunci Kombinasi
