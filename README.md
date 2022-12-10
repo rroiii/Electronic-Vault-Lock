@@ -35,6 +35,7 @@ ___
 <details>
   <summary>Daftar Isi</summary>
   <ol>
+    <li><a href="#Latar-Belakang">Latar Belakang</a></li>
     <li><a href="#dekripsi">Dekripsi</a></li>
     <li><a href="#state---state-kunci-kombinasi">State - State Kunci Kombinasi</a></li>
     <li><a href="#state-diagram">State Diagram</a></li>
