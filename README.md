@@ -50,12 +50,16 @@ digit1
 digit2
 digit3
 ```
+## State Diagram
+<div>
+    <img src="State Diagram Synthesis.png" alt="Logo" width="400" height="400">
+  </div>
+  
 ## Alur Kerja State Pada Kunci Kombinasi
 
 - Pada state start, Diberikan waktu untuk menerima input digit selama 5 detik. Jika sudah melewati 5 detik dan input digit dimasukkan salah, maka akan pergi ke state    waitTimer. Dimana pada state waitTimer, user harus menunggu 30 detik agar dapat menerima input lagi. Jika input sudah benar, maka akan ke state digit1.
 - Pada state digit1 mirip dengan state start, dimana menerima input digit selama 5 detik. Jika salah akan ke state waitTimer dan jika benar maka akan ke state digit berikutnya. State digit2,digit3 mirip juga seperti state start.
 - Jika pada state digit3 sudah benar diberikan inputnya, maka next statenya akan berubah menjadi state unlocked. Pada state unlocked, akan diberikan waktu input button_set dan button_lock selama 5 detik untuk menentukan jika ingin kembalik lock kunci atau set kunci kombinasi yang baru. Jika dipencet tombol lock, maka akan balik ke state start. Jika dipencet tombol set, maka akan set kunci kombinasi yang baru menggunakan enum tambahan yaitu unlocking dan setNewLock. Untuk menentukan apabali kunci sedang diunlock oleh user atau sedang diset kunci kombinasi yang baru oleh user.
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
