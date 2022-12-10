@@ -21,6 +21,16 @@
   </p>
 </div>
 
+___
+___
+**Kelompok PSD B11:**
++ Akmal Rabbani	- 2106731610
++ Roy Oswaldha - 2106731592
++ Seno Pamungkas Rahman - 2106731586
++ Sulthan Satrya Yudha Darmawan - 2106731560
+___
+___
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Daftar Isi</summary>
@@ -33,6 +43,7 @@
      <li><a href="#sintesis-rangkaian">Sintesis Rangkaian</a></li>
   </ol>
 </details>
+
 
 ## Dekripsi
 Kunci kombinasi ini menerima 4 digit angka secara satu persatu. Jika semua digit yang dimasukkan benar, maka kunci kombinasi akan terbuka. Untuk memperlihatkan digit-digit akan tersebut digunakan 4 seven segment dan juga terdapat 4 LED yang digunakan untuk menandakan jika input angka yang dimasukkan benar atau tidak pada kunci kombinasinya. Setiap digit masing-masing dipasang dengan sebuah seven segment display dan LED. Setiap digit benar yang dimasukkan ke kunci kombinasi tersebut, maka seven segment akan mendisplay angka tersebut dan LED akan menyala warna hijau. Jika digit yang dimasukkan salah, maka seven segment tidak akan mendisplay apa-apa dan LED akan menyala berwarna merah, menyatakan bahwa digit yang dimasukkan salah.
