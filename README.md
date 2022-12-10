@@ -1,4 +1,24 @@
-# Electronic-Vault-Lock
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <h3 align="center">Electronic Vault Lock</h3>
+
+  <p align="center">
+    
+    <br />
+    <a href="https://github.com/rroiii/Electronic-Vault-Lock"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/rroiii/Electronic-Vault-Lock">View Demo</a>
+    ·
+    <a href="https://github.com/rroiii/Electronic-Vault-Lock/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/rroiii/Electronic-Vault-Lock/issues">Request Feature</a>
+  </p>
+</div>
 
 ## Dekripsi
 Kunci kombinasi ini menerima 4 digit angka secara satu persatu. Jika semua digit yang dimasukkan benar, maka kunci kombinasi akan terbuka. Untuk memperlihatkan digit-digit akan tersebut digunakan 4 seven segment dan juga terdapat 4 LED yang digunakan untuk menandakan jika input angka yang dimasukkan benar atau tidak pada kunci kombinasinya. Setiap digit masing-masing dipasang dengan sebuah seven segment display dan LED. Setiap digit benar yang dimasukkan ke kunci kombinasi tersebut, maka seven segment akan mendisplay angka tersebut dan LED akan menyala warna hijau. Jika digit yang dimasukkan salah, maka seven segment tidak akan mendisplay apa-apa dan LED akan menyala berwarna merah, menyatakan bahwa digit yang dimasukkan salah.
@@ -24,3 +44,10 @@ digit3
 - Pada state start, Diberikan waktu untuk menerima input digit selama 5 detik. Jika sudah melewati 5 detik dan input digit dimasukkan salah, maka akan pergi ke state    waitTimer. Dimana pada state waitTimer, user harus menunggu 30 detik agar dapat menerima input lagi. Jika input sudah benar, maka akan ke state digit1.
 - Pada state digit1 mirip dengan state start, dimana menerima input digit selama 5 detik. Jika salah akan ke state waitTimer dan jika benar maka akan ke state digit berikutnya. State digit2,digit3 mirip juga seperti state start.
 - Jika pada state digit3 sudah benar diberikan inputnya, maka next statenya akan berubah menjadi state unlocked. Pada state unlocked, akan diberikan waktu input button_set dan button_lock selama 5 detik untuk menentukan jika ingin kembalik lock kunci atau set kunci kombinasi yang baru. Jika dipencet tombol lock, maka akan balik ke state start. Jika dipencet tombol set, maka akan set kunci kombinasi yang baru menggunakan enum tambahan yaitu unlocking dan setNewLock. Untuk menentukan apabali kunci sedang diunlock oleh user atau sedang diset kunci kombinasi yang baru oleh user.
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
+[contributors-url]: https://github.com/rroiii/Electronic-Vault-Lock/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
+[forks-url]: https://github.com/rroiii/Electronic-Vault-Lock/network/members
