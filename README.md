@@ -23,12 +23,14 @@
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Daftar Isi</summary>
   <ol>
     <li><a href="#dekripsi">Dekripsi</a></li>
     <li><a href="#state---state-kunci-kombinasi">State - State Kunci Kombinasi</a></li>
     <li><a href="#state-diagram">State Diagram</a></li>
     <li><a href="#alur-kerja-state-pada-kunci-kombinasi">Alur Kerja State Pada Kunci Kombinasi</a></li>
+     <li><a href="#hasil-wave-simulation-modelsim">Hasil Wave Simulation ModelSim</a></li>
+     <li><a href="#sintesis-rangkaian">Sintesis Rangkaian</a></li>
   </ol>
 </details>
 
@@ -54,7 +56,7 @@ digit3
 ## State Diagram
 <div>
     <img src="State Diagram Synthesis.png" alt="Logo" width="400" height="400">
-  </div>
+</div>
   
 ## Alur Kerja State Pada Kunci Kombinasi
 
@@ -62,15 +64,14 @@ digit3
 - Pada state digit1 mirip dengan state start, dimana menerima input digit selama 5 detik. Jika salah akan ke state waitTimer dan jika benar maka akan ke state digit berikutnya. State digit2,digit3 mirip juga seperti state start.
 - Jika pada state digit3 sudah benar diberikan inputnya, maka next statenya akan berubah menjadi state unlocked. Pada state unlocked, akan diberikan waktu input button_set dan button_lock selama 5 detik untuk menentukan jika ingin kembalik lock kunci atau set kunci kombinasi yang baru. Jika dipencet tombol lock, maka akan balik ke state start. Jika dipencet tombol set, maka akan set kunci kombinasi yang baru menggunakan enum tambahan yaitu unlocking dan setNewLock. Untuk menentukan apabali kunci sedang diunlock oleh user atau sedang diset kunci kombinasi yang baru oleh user.
 
+## Hasil Wave Simulation ModelSim
+![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Hasil%20Test%20Bench.png)
+
+## Sintesis Rangkaian
+![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Synthesis.png)
+
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
 [contributors-url]: https://github.com/rroiii/Electronic-Vault-Lock/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
 [forks-url]: https://github.com/rroiii/Electronic-Vault-Lock/network/members
-
-
-Hasil Test Bench
-![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Hasil%20Test%20Bench.png)
-
-Hasil Synthesis
-![alt text](https://github.com/rroiii/Electronic-Vault-Lock/blob/main/Synthesis.png)
