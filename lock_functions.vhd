@@ -42,6 +42,13 @@ PACKAGE lock_functions IS
         SIGNAL seven_segment : INOUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 
+    PROCEDURE EncryptPassword(
+        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
+        SIGNAL KEY: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL decrypted_password : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL encrypted_password : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+    );
+
 END PACKAGE lock_functions;
 
 PACKAGE BODY lock_functions IS
@@ -154,5 +161,22 @@ PACKAGE BODY lock_functions IS
                 seven_segment <= "1111111";
         end case;
     END PROCEDURE Display_number_seven_segment;
+    
+    PROCEDURE EncryptPassword(
+        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
+        SIGNAL KEY: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL decrypted_password : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL encrypted_password : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+    )IS 
+    BEGIN 
+        FOR i IN decrypted_password'RANGE LOOP
+            temp(i) <= decrypted_password(i);
+        END LOOP;
+
+
+        FOR i IN decrypted_password'RANGE LOOP
+            encrypted_password (i) <= KEY(i) XOR temp(i);
+        END LOOP;
+    END PROCEDURE EncryptPassword;
 
 END PACKAGE BODY lock_functions;

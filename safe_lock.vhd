@@ -30,10 +30,11 @@ ENTITY safe_lock IS
 END safe_lock;
 
 ARCHITECTURE comb_lock OF safe_lock IS
+    SIGNAL temp : STD_LOGIC_VECTOR(0 TO 15);
     SIGNAL state : state_digit := start; -- State of the combination lock digit
     SIGNAL nextState : state_digit := digit1; -- Next State
     SIGNAL state_lock : state_lock := unlocking; -- State whether the user is unlocking the lock or setting a new password digit
-
+    SIGNAL KEY : std_logic_vector(15 downto 0) := "1010101010101010";
     SIGNAL correctCombination : int_array := (4, 2, 3, 5); -- Correct combination
     SIGNAL correctCombinationBinary : STD_LOGIC_VECTOR(0 TO 15) := "0100001000110101"; -- Correct combination in binary
 
@@ -42,21 +43,22 @@ ARCHITECTURE comb_lock OF safe_lock IS
     -- password encrypter component
     COMPONENT password_decrypter
         PORT (
+            KEY: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             encrypted_password : IN STD_LOGIC_VECTOR (0 TO 15);
             decrypted_password : OUT STD_LOGIC_VECTOR(0 TO 15)
         );
     END COMPONENT;
 
     -- password encrypter component instance
-    SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15);
-    SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15);
+    SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "1110100010011111";
+    SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "0000000000000000";
 
     SIGNAL seg_min : STD_LOGIC_VECTOR(3 DOWNTO 0); 
     SIGNAL seg_sec1 : STD_LOGIC_VECTOR(3 DOWNTO 0); 
     SIGNAL seg_sec2 : STD_LOGIC_VECTOR(3 DOWNTO 0); 
 
 BEGIN
-    P1 : password_decrypter PORT MAP(encrypted_password => encrypted_password, decrypted_password => decrypted_password);
+    P1 : password_decrypter PORT MAP(KEY => KEY, encrypted_password => encrypted_password, decrypted_password => correctCombinationBinary);
 
     PROCESS (clk, rst)
     BEGIN
@@ -127,6 +129,8 @@ BEGIN
                     END IF;
 
                     IF (state_lock = setNewLock) THEN 
+                        --Encrypt password
+                        EncryptPassword(temp,KEY,correctCombinationBinary,encrypted_password);
                         -- Convert the new password to integer (for easier reading)
                         correctCombination(0) <= to_integer(unsigned(correctCombinationBinary(0 TO 3)));
                         correctCombination(1) <= to_integer(unsigned(correctCombinationBinary(4 TO 7)));
