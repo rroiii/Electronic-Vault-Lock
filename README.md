@@ -27,6 +27,7 @@
   <ol>
     <li><a href="#dekripsi">Dekripsi</a></li>
     <li><a href="#state---state-kunci-kombinasi">State - State Kunci Kombinasi</a></li>
+    <li><a href="#state-diagram">State Diagram</a></li>
     <li><a href="#alur-kerja-state-pada-kunci-kombinasi">Alur Kerja State Pada Kunci Kombinasi</a></li>
   </ol>
 </details>
