@@ -9,3 +9,13 @@ Waktu yang berikan pada kode VHDL ini menggunakan constant, sehingga sifatnya di
 
 Untuk keamanan yang lebih baik, pada kode VHDL ini juga menerapkan enkripsi dan dekripsi pada password yang disimpannya. Password akan disimpan dalam bentuk terenkripsi. Kemudian pada saat state start, password akan didekripsi terlebih dahulu agar bisa dicocokan dengan password yang akan dimasukkan. Hal tersebut dikarenakan password akan dimasukkan secara satu persatu, sehingga agar dapat dicocokkan dengan password yang tersimpan, password yang tersimpan harus didekripsi terlebih dahulu. 
 Pada saat mengganti password pada state unlocked, password yang diinputkan juga akan dienkripsi kembali. Dengan begitu password yang disimpan akan selalu terenkripsi.
+
+## State - State Kunci Kombinasi
+```bash
+start
+unlocked
+waitTimer
+digit1
+digit2
+digit3
+```
