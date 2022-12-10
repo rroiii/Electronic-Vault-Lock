@@ -19,10 +19,10 @@ ENTITY safe_lock IS
         -- 00 = OFF, RED = 01, GREEN = 10
         lamp_digit1, lamp_digit2, lamp_digit3, lamp_digit4 : INOUT STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; -- Output lamp for each digit 
 
-        Seven_Segment_digit1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for digit 1 on the seven segment display
-        Seven_Segment_digit2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for digit 2 on the seven segment display
-        Seven_Segment_digit3 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for digit 3 on the seven segment display
-        Seven_Segment_digit4 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for digit 4 on the seven segment display
+        Seven_Segment_digit1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 1 on the seven segment display
+        Seven_Segment_digit2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 2 on the seven segment display
+        Seven_Segment_digit3 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 3 on the seven segment display
+        Seven_Segment_digit4 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 4 on the seven segment display
 
         Seven_Segment_Seconds1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for the first digit seconds on the seven segment display
         Seven_Segment_Seconds2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for the second digit seconds on the seven segment display
@@ -65,11 +65,11 @@ BEGIN
     BEGIN
         IF rst = '1' THEN
             state <= start; -- Reset the state to start
-            counter <= inputWaitTime; -- Reset the counter to inputWaitTime
-            seg_min <= "0000"; -- Clear the minutes on the seven segment display
-            seg_sec1 <= "0000"; -- Clear the seconds on the seven segment display
-            seg_sec2 <= "0000"; -- Clear the seconds on the seven segment display
-        ELSIF rising_edge(clk) THEN
+            nextState <= digit1; -- Reset the next state to digit1
+            state_lock <= unlocking; -- Reset state to unlocking
+            correct <= '0'; -- Reset correct to '0'
+            SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2); -- Reset the counter to inputWaitTime
+            ELSIF rising_edge(clk) THEN
             CASE state IS
                 WHEN start =>
                     -- Set All LED lights to RED (01)
@@ -146,7 +146,7 @@ BEGIN
                         state <= start;
                         nextState <= digit1;
                         state_lock <= unlocking;
-                        counter <= inputWaitTime;
+                        SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
 
                         -- When pressed, set a new digit combination password     
@@ -154,7 +154,7 @@ BEGIN
                         state <= start;
                         nextState <= digit1;
                         state_lock <= setNewLock;
-                        counter <= inputSetLockTime;
+                        SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
                     ELSE
                         DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
