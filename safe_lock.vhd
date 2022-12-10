@@ -12,17 +12,17 @@ ENTITY safe_lock IS
         clk : IN STD_LOGIC; -- Clock signal
         rst : IN STD_LOGIC := '0'; -- Reset signal
         d : IN STD_LOGIC_VECTOR(0 TO 3); -- Input for the combination lock
-        btn_lock : IN STD_LOGIC := '0'; -- Button to lock the safe
-        btn_set : IN STD_LOGIC := '0'; -- Button to set new password for the combination lock
+        btn_lock : INOUT STD_LOGIC := '0'; -- Button to lock the safe
+        btn_set : INOUT STD_LOGIC := '0'; -- Button to set new password for the combination lock
         correct : OUT STD_LOGIC := '0'; -- Output indicating if the combination is correct (Default is 0)
 
         -- 00 = OFF, RED = 01, GREEN = 10
         lamp_digit1, lamp_digit2, lamp_digit3, lamp_digit4 : INOUT STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; -- Output lamp for each digit 
 
-        Seven_Segment_digit1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 1 on the seven segment display
-        Seven_Segment_digit2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 2 on the seven segment display
-        Seven_Segment_digit3 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 3 on the seven segment display
-        Seven_Segment_digit4 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "1111111"; -- Output for digit 4 on the seven segment display
+        Seven_Segment_digit1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "0000001"; -- Output for digit 1 on the seven segment display
+        Seven_Segment_digit2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "0000001"; -- Output for digit 2 on the seven segment display
+        Seven_Segment_digit3 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "0000001"; -- Output for digit 3 on the seven segment display
+        Seven_Segment_digit4 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0) := "0000001"; -- Output for digit 4 on the seven segment display
 
         Seven_Segment_Seconds1 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for the first digit seconds on the seven segment display
         Seven_Segment_Seconds2 : INOUT STD_LOGIC_VECTOR (6 DOWNTO 0); -- Output for the second digit seconds on the seven segment display
@@ -31,31 +31,18 @@ ENTITY safe_lock IS
 END safe_lock;
 
 ARCHITECTURE comb_lock OF safe_lock IS
-    SIGNAL temp : STD_LOGIC_VECTOR(0 TO 15); -- Temporary Signal for encryption usages
+
     SIGNAL state : state_digit := start; -- State of the combination lock digit
     SIGNAL nextState : state_digit := digit1; -- Next State
     SIGNAL state_lock : state_lock := unlocking; -- State whether the user is unlocking the lock or setting a new password digit
-
     SIGNAL correctCombination : int_array := (4, 2, 3, 5); -- Correct combination
-
+    SIGNAL correctCombinationBinary : STD_LOGIC_VECTOR(0 TO 15) := "0100001000110101"; -- Correct combination in binary
 
     SIGNAL counter : INTEGER RANGE 0 TO 300 := inputWaitTime; -- 5-minute counters, Default value is 5 seconds
 
-    -- password encrypter component
-    COMPONENT password_decrypter IS
-    PORT (
-        KEY: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        encrypted_password : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
-    );
-
-        END COMPONENT password_decrypter;
-
-    SIGNAL KEY : STD_LOGIC_VECTOR(15 DOWNTO 0) := "1010101010101010";
-    SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "1110100010011111";
-    signal correctCombinationBinary : STD_LOGIC_VECTOR(0 TO 15) := "0000000000000000";
     -- password encrypter component instance
-    SIGNAL decrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "0000000000000000";
+    SIGNAL KEY : STD_LOGIC_VECTOR(15 DOWNTO 0) := "1010101010101010"; -- Key for the encryption and decryption password
+    SIGNAL encrypted_password : STD_LOGIC_VECTOR (0 TO 15) := "1110100010011111";
 
     SIGNAL seg_min : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
     SIGNAL seg_sec1 : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
@@ -63,12 +50,8 @@ ARCHITECTURE comb_lock OF safe_lock IS
 
 BEGIN
 
-    P1 : password_decrypter PORT MAP(KEY, encrypted_password, decrypted_password);
-    correctCombinationBinary <= decrypted_password;
-
     PROCESS (clk, rst)
     BEGIN
-        correctCombinationBinary <= decrypted_password;
         IF rst = '1' THEN
             state <= start; -- Reset the state to start
             nextState <= digit1; -- Reset the next state to digit1
@@ -76,9 +59,9 @@ BEGIN
             correct <= '0'; -- Reset correct to '0'
             SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2); -- Reset the counter to inputWaitTime
             ELSIF rising_edge(clk) THEN
-
             CASE state IS
                 WHEN start =>
+                    DecryptPassword(KEY, encrypted_password, correctCombinationBinary);
                     -- Set All LED lights to RED (01)
                     IF rising_edge(clk_lamp) THEN
                         lamp_digit1 <= "01";
@@ -96,6 +79,7 @@ BEGIN
 
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit2_STATE,
                     d, correctCombinationBinary(0 TO 3), correct, Seven_Segment_digit1, lamp_digit1);
+
                 WHEN digit1 =>
                     InputDigit(counter, seg_min, seg_sec1, seg_sec2, state, nextState, state_lock, digit3_STATE,
                     d, correctCombinationBinary(4 TO 7), correct, Seven_Segment_digit2, lamp_digit2);
@@ -140,7 +124,7 @@ BEGIN
                     -- And encrypt password
                     IF (state_lock = setNewLock) THEN
                         --Encrypt password
-                        EncryptPassword(temp, KEY, correctCombinationBinary, encrypted_password);
+                        EncryptPassword(KEY, correctCombinationBinary, encrypted_password);
                         -- Convert the new password to integer (for easier reading)
                         correctCombination(0) <= to_integer(unsigned(correctCombinationBinary(0 TO 3)));
                         correctCombination(1) <= to_integer(unsigned(correctCombinationBinary(4 TO 7)));
@@ -155,7 +139,7 @@ BEGIN
                         state_lock <= unlocking;
                         SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
-
+                        btn_lock <= '0';
                         -- When pressed, set a new digit combination password     
                     ELSIF (btn_set = '1') THEN
                         state <= start;
@@ -163,6 +147,7 @@ BEGIN
                         state_lock <= setNewLock;
                         SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
                         correct <= '0';
+                        btn_set <= '0';
                     ELSE
                         DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
                     END IF;

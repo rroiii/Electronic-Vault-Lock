@@ -43,17 +43,15 @@ PACKAGE lock_functions IS
     );
 
     PROCEDURE EncryptPassword(
-        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
         SIGNAL KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         SIGNAL decrypted_password : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         SIGNAL encrypted_password : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
     );
 
     PROCEDURE DecryptPassword(
-        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
-        SIGNAL KEY : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL encrypted_password : INOUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+        SIGNAL KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL encrypted_password : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+        SIGNAL decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
 
     PROCEDURE SetCounter(
@@ -63,8 +61,6 @@ PACKAGE lock_functions IS
         SIGNAL seg_sec1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         SIGNAL seg_sec2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
-
-
 END PACKAGE lock_functions;
 
 PACKAGE BODY lock_functions IS
@@ -109,7 +105,11 @@ PACKAGE BODY lock_functions IS
                 IF (counter = 0) THEN
                     state <= nextState;
                     nextState <= setState;
-                    SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
+                    IF (nextState = unlocked) THEN
+                        SetCounter(inputWaitTime, counter, seg_min, seg_sec1, seg_sec2);
+                    ELSE
+                        SetCounter(inputSetLockTime, counter, seg_min, seg_sec1, seg_sec2);
+                    END IF;
                     correctDigitBinary <= d; -- Set the new digit password
                 ELSE
                     DecrementCounter(counter, seg_min, seg_sec1, seg_sec2);
@@ -180,36 +180,24 @@ PACKAGE BODY lock_functions IS
 
     -- To encrypt password
     PROCEDURE EncryptPassword(
-        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
         SIGNAL KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         SIGNAL decrypted_password : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         SIGNAL encrypted_password : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
     )IS
     BEGIN
-
         FOR i IN decrypted_password'RANGE LOOP
-            temp(i) <= decrypted_password(i);
+            encrypted_password (i) <= KEY(i) XOR decrypted_password(i);
         END LOOP;
-        FOR i IN decrypted_password'RANGE LOOP
-            encrypted_password (i) <= KEY(i) XOR temp(i);
-        END LOOP;
-
     END PROCEDURE EncryptPassword;
 
     PROCEDURE DecryptPassword(
-        SIGNAL temp : INOUT STD_LOGIC_VECTOR(0 TO 15);
-        SIGNAL KEY : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL encrypted_password : INOUT STD_LOGIC_VECTOR (15 DOWNTO 0)
-    )IS
+        SIGNAL KEY : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL encrypted_password : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+        SIGNAL decrypted_password : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    ) IS
     BEGIN
-
         FOR i IN encrypted_password'RANGE LOOP
-            temp(i) <= KEY(i) XOR encrypted_password(i);
-        END LOOP;
-
-        FOR i IN encrypted_password'RANGE LOOP
-            decrypted_password(i) <= temp(i);
+            decrypted_password(i) <= KEY(i) XOR encrypted_password(i);
         END LOOP;
 
     END PROCEDURE DecryptPassword;
