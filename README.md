@@ -173,3 +173,6 @@ END ARCHITECTURE rtl;
   [contributors-url]: https://github.com/rroiii/Electronic-Vault-Lock/graphs/contributors
   [forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
   [forks-url]: https://github.com/rroiii/Electronic-Vault-Lock/network/members
+  
+## Video Penjelasan
+  https://youtu.be/S55MchLkiFg
